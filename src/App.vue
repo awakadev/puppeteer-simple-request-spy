@@ -1,17 +1,50 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <ul>
+      <li>{{user.name}}</li>
+      <li>{{user.email}}</li>
+      <li><img :src="user.img" alt=""></li>
+    </ul>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from 'axios'
 
 export default {
   name: 'app',
-  components: {
-    HelloWorld
+  data () {
+    return {
+      user: {
+        name: '',
+        img: '',
+        email: ''
+      },
+      interval: null
+    }
+  },
+  mounted () {
+    this.loadData()
+
+    this.interval = setInterval(function () {
+      this.loadData()
+    }.bind(this), 3000)
+  },
+  methods: {
+    loadData () {
+      axios
+        .get('https://randomuser.me/api/')
+        .then(response => (
+          this.user = {
+            name: response.data.results[0].name.first + ' ' + response.data.results[0].name.last,
+            img: response.data.results[0].picture.medium,
+            email: response.data.results[0].email
+          }
+        ))
+    }
+  },
+  beforeDestroy () {
+    clearInterval(this.interval)
   }
 }
 </script>
@@ -24,5 +57,8 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+ul {
+  list-style-type: none;
 }
 </style>
